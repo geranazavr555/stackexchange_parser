@@ -42,7 +42,7 @@ def gen_html(filename, raw_data, _encoding=settings.out_encoding):
     i = 0
     for user_id in raw_data:
         i += 1
-        gen_row([i, user_id, len(raw_data[user_id])])
+        gen_row([i, user_id, raw_data[user_id]])
 
     while len(stack) > 0:  # закрытие оставшихся тегов
         close_tag()

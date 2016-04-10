@@ -26,14 +26,12 @@ posts = parsing.parse(read_raw_xml(settings.posts_file_name))
 if settings.debug:
     print('reading and parsing time time (sec):', time() - ts)
 
-interested_users = []  # Интересующие нас пользователи...
-interested_users_id = set()  # ... И их id
+interested_users_id = set()  # ID интересующих нас пользователей
 interested_posts = []  # Посты искомых пользователей в подходящее время
 
 # Выбор пользователей с подходящей репутацией
 for user in users:
     if int(user['Reputation']) >= settings.min_reputation:  # Проверка репутации пользователя
-        interested_users.append(user)
         interested_users_id.add(user['Id'])
 
 # Выбор постов искомых пользователей в подходящее время
@@ -47,16 +45,16 @@ for post in posts:
 if settings.debug:
     print('total parsed users:', len(users))
     print('total parsed posts:', len(posts))
-    print('total users that we are interested in:', len(interested_users))
+    print('total users that we are interested in:', len(interested_users_id))
     print('total posts, that we are interested in:', len(interested_posts))
 
 # Предварительная генерация ответа
-raw_output = dict()  # Словарь {id пользователя : список постов}
+raw_output = dict()  # Словарь {id пользователя : количество постов}
 for post in interested_posts:
     if post['OwnerUserId'] in raw_output:
-        raw_output[post['OwnerUserId']].append(post['Id'])
+        raw_output[post['OwnerUserId']] += 1
     else:
-        raw_output[post['OwnerUserId']] = [post['Id']]
+        raw_output[post['OwnerUserId']] = 1
 
 # Окончательная запись ответа
 reporting.gen_html(settings.html_output_file, raw_output)
