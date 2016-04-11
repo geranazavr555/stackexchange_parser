@@ -7,8 +7,9 @@
 import settings
 
 
-def gen_html(filename, raw_data, _encoding=settings.out_encoding):
+def gen_html(filename, raw_data, encoding_=settings.out_encoding):
     """Записывает html-страницу с результатами в %filename%"""
+
     def open_tag(tag):
         file.write(' ' * len(stack) * settings.html_spaces + '<' + tag + '>\n')
         stack.append(tag)
@@ -18,6 +19,7 @@ def gen_html(filename, raw_data, _encoding=settings.out_encoding):
 
     def gen_row(row, th_tag=False):
         """Создаёт и записывает одну строку таблицы"""
+
         open_tag('tr')
         for cell in row:
             if th_tag:
@@ -30,7 +32,7 @@ def gen_html(filename, raw_data, _encoding=settings.out_encoding):
 
     # stack - Хранит список ещё не закрытых html-тегов:
     stack = []
-    file = open(filename, 'w', encoding=_encoding)
+    file = open(filename, 'w', encoding=encoding_)
 
     open_tag('html')
     open_tag('body')

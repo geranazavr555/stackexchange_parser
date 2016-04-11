@@ -10,32 +10,35 @@ import settings
 import parsing
 import reporting
 
+
+def read_raw_xml(filename, encoding_=settings.in_encoding):
+    """Читает %filename% в кодировке %_encoding% и возвращает список строк"""
+
+    start_time = time()
+    file = open(filename, encoding=encoding_)
+    raw_list = file.readlines()
+    file.close()
+
+    if settings.debug:
+        print('reading "' + filename + '" time (sec):', time() - start_time)
+
+    return raw_list
+
 ts = time()
 
 if settings.debug:
     print('= debug mode on =')
-
-
-def read_raw_xml(filename, _encoding=settings.in_encoding):
-    """Читает %filename% в кодировке %_encoding% и возвращает список строк"""
-    treads = time()
-    file = open(filename, encoding=_encoding)
-    raw_list = file.readlines()
-    file.close()
-    if settings.debug:
-        print('reading "' + filename + '" time (sec):', time() - treads)
-    return raw_list
 
 # == Чтение xml ==
 users = parsing.parse(read_raw_xml(settings.users_file_name))
 posts = parsing.parse(read_raw_xml(settings.posts_file_name))
 
 if settings.debug:
-    print('reading and parsing time time (sec):', time() - ts)
+    print('reading and parsing time (sec):', time() - ts)
 
 # ID интересующих нас пользователей:
+# И их посты в подходящее время:
 interested_users_id = set()
-# Посты искомых пользователей в подходящее время:
 interested_posts = []
 
 # == Выбор пользователей с подходящей репутацией ==
