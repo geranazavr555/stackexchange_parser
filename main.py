@@ -41,7 +41,7 @@ interested_posts = []
 # == Выбор пользователей с подходящей репутацией ==
 for user in users:
     # Проверка репутации пользователя:
-    if int(user['Reputation']) >= settings.min_reputation:
+    if settings.min_reputation <= int(user['Reputation']) < settings.max_reputation:
         interested_users_id.add(user['Id'])
 
 # == Выбор постов искомых пользователей в подходящее время ==
