@@ -40,9 +40,9 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding):
 
     gen_row(['#', 'UserID', 'Posts'], th_tag=True)
     i = 0
-    for user_id in raw_data:
+    for row in raw_data:
         i += 1
-        gen_row([i, user_id, raw_data[user_id]])
+        gen_row([i, row[0], row[1]])
 
     # закрытие оставшихся тегов:
     while len(stack) > 0:

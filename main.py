@@ -66,12 +66,20 @@ if settings.debug:
 # == Предварительная генерация ответа ==
 
 # Словарь {id пользователя : количество постов}
-raw_output = dict()
+user_to_posts_count = dict()
+
 for post in interested_posts:
-    if post['OwnerUserId'] in raw_output:
-        raw_output[post['OwnerUserId']] += 1
+    if post['OwnerUserId'] in user_to_posts_count:
+        user_to_posts_count[post['OwnerUserId']] += 1
     else:
-        raw_output[post['OwnerUserId']] = 1
+        user_to_posts_count[post['OwnerUserId']] = 1
+
+# Перевод словаря в список для последующей сортировки
+raw_output = []
+for i in user_to_posts_count:
+    raw_output.append((i, user_to_posts_count[i]))
+# Убывающая сортировка по количеству постов
+raw_output.sort(key=lambda x: x[1], reverse=True)
 
 # == Окончательная запись ответа ==
 reporting.gen_html(settings.html_output_file, raw_output)
