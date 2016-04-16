@@ -21,7 +21,12 @@ in_encoding = 'utf-8'
 html_output_file = 'results.html'
 # Размер отступов в html-разметке на выходе:
 html_spaces = 2
-out_encoding = 'utf-8'
+
+# Генерировать оформление документа? (True - да, False - нет)
+generate_css = True
+
+# Генерировать заголовок отчёта? (True - да, False - нет)
+generate_header = True
 
 # Сайт из Q&A-системы stackexchange (в т. ч. stackoverflow), который парсится
 # Необходимо для корректного составления отчета

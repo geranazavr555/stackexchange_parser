@@ -68,6 +68,7 @@ def gen_html(filename, raw_data, site=settings.website):
     close_tag()
 
     if settings.generate_css:
+        # Генерирование оформления
         open_tag('style', {'type': 'text/css'})
         writeln(gen_css())
         close_tag()
@@ -77,6 +78,7 @@ def gen_html(filename, raw_data, site=settings.website):
     open_tag('body')
 
     if settings.generate_header:
+        # Генерирование заголовка
         open_tag('h1')
         writeln('Результаты выборки')
         close_tag()
@@ -89,6 +91,9 @@ def gen_html(filename, raw_data, site=settings.website):
         open_tag('br')
         close_tag()
         writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(raw_data)))
+        open_tag('br')
+        close_tag()
+        writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
 
         open_tag('hr')
         close_tag()
