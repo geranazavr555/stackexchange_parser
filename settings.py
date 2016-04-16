@@ -18,6 +18,9 @@ html_output_file = 'results.html'
 html_spaces = 2
 out_encoding = 'utf-8'
 
+# Генерировать оформление документа? (True - да, False - нет)
+generate_css = True
+
 # Сайт из Q&A-системы stackexchange (в т. ч. stackoverflow), который парсится
 # Необходимо для корректного составления отчета
 website = 'physics.stackexchange.com'

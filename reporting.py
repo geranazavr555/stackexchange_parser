@@ -62,8 +62,16 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
     file = open(filename, 'w', encoding=encoding_)
 
     open_tag('html')
+
+    if settings.generate_css:
+        open_tag('head')
+        open_tag('style', {'type': 'text/css'})
+        writeln(gen_css())
+        close_tag()
+        close_tag()
+
     open_tag('body')
-    open_tag('table')
+    open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
 
     gen_row(['#', 'User id', 'Posts count'], th_tag=True)
     i = 0
@@ -89,3 +97,40 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
         close_tag()
 
     file.close()
+
+css = ''
+
+
+def gen_css():
+
+    def open_style(stylename):
+        global css
+        css += stylename + ' {\n'
+
+    def close_style():
+        global css
+        css += '}\n'
+
+    def write_style(style):
+        for attribute in style:
+            gen_attribute(attribute, style[attribute])
+
+    def gen_attribute(name, value):
+        global css
+        css += ' ' * settings.html_spaces + name + ': ' + value + ';\n'
+
+    def gen_style(name, attributes):
+        global css
+        css += ''
+        open_style(name)
+        write_style(attributes)
+        close_style()
+
+    global css
+
+    gen_style('table', {'width': '35%', 'margin': 'auto'})
+    gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
+    gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
+    gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
+
+    return css
