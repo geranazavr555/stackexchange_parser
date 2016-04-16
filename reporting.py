@@ -73,7 +73,7 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
     open_tag('body')
     open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
 
-    gen_row(['#', 'User id', 'Posts count'], th_tag=True)
+    gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
     i = 0
     for row in raw_data:
         i += 1
@@ -102,6 +102,11 @@ css = ''
 
 
 def gen_css():
+    """Генератор оформления
+
+    Генерирует готовое оформление таблицы в css-формате
+
+    """
 
     def open_style(stylename):
         global css
@@ -112,14 +117,17 @@ def gen_css():
         css += '}\n'
 
     def write_style(style):
+        """Записывает блок атрибутов стиля"""
         for attribute in style:
             gen_attribute(attribute, style[attribute])
 
     def gen_attribute(name, value):
+        """Записывает пару {Атрибут : Значение}"""
         global css
         css += ' ' * settings.html_spaces + name + ': ' + value + ';\n'
 
     def gen_style(name, attributes):
+        """Записывает один полный стиль"""
         global css
         css += ''
         open_style(name)
