@@ -11,6 +11,7 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
     """Записывает html-страницу с результатами в %filename%"""
 
     def open_tag(tag, attributes=None):
+        # Если атрибутов нет - простой тег, иначе - генерация тега с атрибутами
         if attributes is None:
             line = '<' + tag + '>'
         else:
@@ -25,9 +26,16 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
         writeln('</' + stack.pop() + '>')
 
     def gen_link(num, type_='users', website=site):
+        """Генерирует адрес ресурса
+
+        type_ - тип ресурса, по умолчанию = users
+        num - номер ресураа
+
+        """
         return 'http://' + website + '/' + type_ + '/' + num
 
     def writeln(line):
+        """Записывает строку с отступами в выходной файл"""
         file.write(' ' * len(stack) * settings.html_spaces + line + '\n')
 
     def gen_row(row, th_tag=False, user_id_pos=1):
@@ -40,7 +48,8 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
             else:
                 open_tag('td')
             if cell_i == user_id_pos:
-                open_tag('a', {'href': gen_link(row[cell_i])})
+                # Если текущая ячейка - user_id, то сгенерировать ссылку на него
+                open_tag('a', {'href': gen_link(row[cell_i]), 'target': '_blank'})
                 writeln(str(row[cell_i]))
                 close_tag()
             else:
