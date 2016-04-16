@@ -69,13 +69,17 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
     i = 0
     for row in raw_data:
         i += 1
+        # Учитывание ограничений, заданных пользователем
         if settings.out_limit_type == 1:
+            # Проверка ограничения на число пользователей
             if i > settings.out_limit:
                 break
         elif settings.out_limit_type == 2:
+            # Проверка мягкого ограничения на число пользователей
             if row[1] < raw_data[settings.out_limit - 1][1]:
                 break
         elif settings.out_limit_type == 3:
+            # Проверка количества постов
             if row[1] < settings.out_limit:
                 break
         gen_row([i, row[0], row[1]])
