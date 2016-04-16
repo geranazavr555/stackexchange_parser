@@ -7,26 +7,44 @@
 import settings
 
 
-def gen_html(filename, raw_data, encoding_=settings.out_encoding):
+def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.website):
     """Записывает html-страницу с результатами в %filename%"""
 
-    def open_tag(tag):
-        file.write(' ' * len(stack) * settings.html_spaces + '<' + tag + '>\n')
+    def open_tag(tag, attributes=None):
+        if attributes is None:
+            line = '<' + tag + '>'
+        else:
+            line = '<' + tag
+            for attribute in attributes:
+                line += ' ' + attribute + '="' + attributes[attribute] + '"'
+            line += '>'
+        writeln(line)
         stack.append(tag)
 
     def close_tag():
-        file.write(' ' * (len(stack) - 1) * settings.html_spaces + '</' + stack.pop() + '>\n')
+        writeln('</' + stack.pop() + '>')
 
-    def gen_row(row, th_tag=False):
+    def gen_link(num, type_='users', website=site):
+        return 'http://' + website + '/' + type_ + '/' + num
+
+    def writeln(line):
+        file.write(' ' * len(stack) * settings.html_spaces + line + '\n')
+
+    def gen_row(row, th_tag=False, user_id_pos=1):
         """Создаёт и записывает одну строку таблицы"""
 
         open_tag('tr')
-        for cell in row:
+        for cell_i in range(len(row)):
             if th_tag:
                 open_tag('th')
             else:
                 open_tag('td')
-            file.write(' ' * len(stack) * settings.html_spaces + str(cell) + '\n')
+            if cell_i == user_id_pos:
+                open_tag('a', {'href': gen_link(row[cell_i])})
+                writeln(str(row[cell_i]))
+                close_tag()
+            else:
+                writeln(str(row[cell_i]))
             close_tag()
         close_tag()
 
@@ -38,7 +56,7 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding):
     open_tag('body')
     open_tag('table')
 
-    gen_row(['#', 'UserID', 'Posts'], th_tag=True)
+    gen_row(['#', 'User id', 'Posts count'], th_tag=True)
     i = 0
     for row in raw_data:
         i += 1
