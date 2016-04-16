@@ -7,7 +7,7 @@
 import settings
 
 
-def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.website):
+def gen_html(filename, raw_data, site=settings.website):
     """Записывает html-страницу с результатами в %filename%"""
 
     def open_tag(tag, attributes=None):
@@ -59,18 +59,40 @@ def gen_html(filename, raw_data, encoding_=settings.out_encoding, site=settings.
 
     # stack - Хранит список ещё не закрытых html-тегов:
     stack = []
-    file = open(filename, 'w', encoding=encoding_)
+    file = open(filename, 'w', encoding='utf-8')
 
     open_tag('html')
+    open_tag('head')
+
+    open_tag('meta', {'charset': 'utf-8'})
+    close_tag()
 
     if settings.generate_css:
-        open_tag('head')
         open_tag('style', {'type': 'text/css'})
         writeln(gen_css())
         close_tag()
         close_tag()
 
+    close_tag()
     open_tag('body')
+
+    if settings.generate_header:
+        open_tag('h1')
+        writeln('Результаты выборки')
+        close_tag()
+
+        open_tag('hr')
+        close_tag()
+
+        writeln('Для перехода к профилю пользователя на сайте ' + settings.website +
+                ' перейдите по ссылке, кликнув на идентификатор пользователя')
+        open_tag('br')
+        close_tag()
+        writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(raw_data)))
+
+        open_tag('hr')
+        close_tag()
+
     open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
 
     gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
