@@ -6,12 +6,12 @@
 
 from time import time
 
-import settings
+from settings import settings
 import parsing
 import reporting
 
 
-def read_raw_xml(filename, encoding_=settings.in_encoding):
+def read_raw_xml(filename, encoding_=settings['in_encoding']):
     """Читает %filename% в кодировке %_encoding% и возвращает список строк"""
 
     start_time = time()
@@ -19,21 +19,21 @@ def read_raw_xml(filename, encoding_=settings.in_encoding):
     raw_list = file.readlines()
     file.close()
 
-    if settings.debug:
+    if settings['debug']:
         print('reading "' + filename + '" time (sec):', time() - start_time)
 
     return raw_list
 
 ts = time()
 
-if settings.debug:
+if settings['debug']:
     print('= debug mode on =')
 
 # == Чтение xml ==
-users = parsing.parse(read_raw_xml(settings.users_file_name))
-posts = parsing.parse(read_raw_xml(settings.posts_file_name))
+users = parsing.parse(read_raw_xml(settings['users_file_name']))
+posts = parsing.parse(read_raw_xml(settings['posts_file_name']))
 
-if settings.debug:
+if settings['debug']:
     print('reading and parsing time (sec):', time() - ts)
 
 # ID интересующих нас пользователей:
@@ -47,30 +47,30 @@ accepted_answers_id = set()
 # == Выбор пользователей с подходящей репутацией ==
 for user in users:
     # Проверка репутации пользователя:
-    if settings.min_reputation <= int(user['Reputation']) < settings.max_reputation:
+    if settings['min_reputation'] <= int(user['Reputation']) < settings['max_reputation']:
         interested_users_id.add(user['Id'])
 
 # Если необходимо, поиск ответов, которые были помечены автором вопроса
-if settings.filter_accepted:
+if settings['filter_accepted']:
     for post in posts:
         accepted_answers_id.add(post.get('AcceptedAnswerId'))
 
 # == Выбор постов искомых пользователей в подходящее время ==
 for post in posts:
     # Если тип поста подходящий:
-    if post['PostTypeId'] == settings.post_type:
+    if post['PostTypeId'] == settings['post_type']:
         # Если пост написан подходящим пользователем:
         if post.get('OwnerUserId') in interested_users_id:
             # Если пост написан в подходящее время:
-            if settings.min_hour <= parsing.get_hour(post['CreationDate']) < settings.max_hour:
+            if settings['min_hour'] <= parsing.get_hour(post['CreationDate']) < settings['max_hour']:
                 # Если необходимо, отбор ответов, помеченых автором вопроса
-                if settings.filter_accepted:
+                if settings['filter_accepted']:
                     if post['Id'] in accepted_answers_id:
                         interested_posts.append(post)
                 else:
                     interested_posts.append(post)
 
-if settings.debug:
+if settings['debug']:
     print('total parsed users:', len(users))
     print('total parsed posts:', len(posts))
     print('total users that we are interested in:', len(interested_users_id))
@@ -95,7 +95,7 @@ for i in user_to_posts_count:
 raw_output.sort(key=lambda x: x[1], reverse=True)
 
 # == Окончательная запись ответа ==
-reporting.gen_html(settings.html_output_file, raw_output)
+reporting.gen_html(settings['html_output_file'], raw_output)
 
-if settings.debug:
+if settings['debug']:
     print('total time (sec):', time() - ts)

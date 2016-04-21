@@ -4,10 +4,10 @@
 
 """
 
-import settings
+from settings import settings
 
 
-def gen_html(filename, raw_data, site=settings.website):
+def gen_html(filename, raw_data, site=settings['website']):
     """Записывает html-страницу с результатами в %filename%"""
 
     def open_tag(tag, attributes=None):
@@ -36,7 +36,7 @@ def gen_html(filename, raw_data, site=settings.website):
 
     def writeln(line):
         """Записывает строку с отступами в выходной файл"""
-        file.write(' ' * len(stack) * settings.html_spaces + line + '\n')
+        file.write(' ' * len(stack) * settings['html_spaces'] + line + '\n')
 
     def gen_row(row, th_tag=False, user_id_pos=1):
         """Создаёт и записывает одну строку таблицы"""
@@ -67,7 +67,7 @@ def gen_html(filename, raw_data, site=settings.website):
     open_tag('meta', {'charset': 'utf-8'})
     close_tag()
 
-    if settings.generate_css:
+    if settings['generate_css']:
         # Генерирование оформления
         open_tag('style', {'type': 'text/css'})
         writeln(gen_css())
@@ -77,7 +77,7 @@ def gen_html(filename, raw_data, site=settings.website):
     close_tag()
     open_tag('body')
 
-    if settings.generate_header:
+    if settings['generate_header']:
         # Генерирование заголовка
         open_tag('h1')
         writeln('Результаты выборки')
@@ -86,7 +86,7 @@ def gen_html(filename, raw_data, site=settings.website):
         open_tag('hr')
         close_tag()
 
-        writeln('Для перехода к профилю пользователя на сайте ' + settings.website +
+        writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
                 ' перейдите по ссылке, кликнув на идентификатор пользователя')
         open_tag('br')
         close_tag()
@@ -105,17 +105,17 @@ def gen_html(filename, raw_data, site=settings.website):
     for row in raw_data:
         i += 1
         # Учитывание ограничений, заданных пользователем
-        if settings.out_limit_type == 1:
+        if settings['out_limit_type'] == 1:
             # Проверка ограничения на число пользователей
-            if i > settings.out_limit:
+            if i > settings['out_limit']:
                 break
-        elif settings.out_limit_type == 2:
+        elif settings['out_limit_type'] == 2:
             # Проверка мягкого ограничения на число пользователей
-            if row[1] < raw_data[settings.out_limit - 1][1]:
+            if row[1] < raw_data[settings['out_limit'] - 1][1]:
                 break
-        elif settings.out_limit_type == 3:
+        elif settings['out_limit_type'] == 3:
             # Проверка количества постов
-            if row[1] < settings.out_limit:
+            if row[1] < settings['out_limit']:
                 break
         gen_row([i, row[0], row[1]])
 
@@ -151,7 +151,7 @@ def gen_css():
     def gen_attribute(name, value):
         """Записывает пару {Атрибут : Значение}"""
         global css
-        css += ' ' * settings.html_spaces + name + ': ' + value + ';\n'
+        css += ' ' * settings['html_spaces'] + name + ': ' + value + ';\n'
 
     def gen_style(name, attributes):
         """Записывает один полный стиль"""

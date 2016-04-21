@@ -6,7 +6,7 @@
 
 from time import time
 
-import settings
+from settings import settings
 
 
 def parse(raw_data):
@@ -21,7 +21,7 @@ def parse(raw_data):
     for row in raw_data:
         parsed_data.append(parse_xml_line(row))
 
-    if settings.debug:
+    if settings['debug']:
         print('parse() time (sec):', time() - start_time)
 
     return parsed_data
