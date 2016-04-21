@@ -1,63 +1,27 @@
 """Файл настроек"""
 
-# === Режим отладки: ===
 
-debug = False
+def read_strings_from_file(filename):
+    file = open(filename, 'r')
+    raw_list = file.readlines()
+    file.close()
+    return raw_list
 
-# === Настройки ввода: ===
 
-# Если файл находится в подкаталоге, укажите относительный путь к нему
-users_file_name = 'files/Users.xml'
-posts_file_name = 'files/Posts.xml'
-in_encoding = 'utf-8'
+class Settings:
+    def __init__(self):
+        self.data = {}
+        self.load_from_file()
 
-# === Настройки составления отчета: ===
+    def load_from_file(self, filename='default.cfg'):
+        raw = read_strings_from_file(filename)
+        for line in raw:
+            if line.startswith('#') or line.startswith('\n'):
+                continue
+            key, value = line.split(' = ')
+            self.data[key] = value
 
-html_output_file = 'results.html'
-# Размер отступов в html-разметке на выходе:
-html_spaces = 2
+    def clear(self):
+        self.data.clear()
 
-# Генерировать оформление документа? (True - да, False - нет)
-generate_css = True
-
-# Генерировать заголовок отчёта? (True - да, False - нет)
-generate_header = True
-
-# Сайт из Q&A-системы stackexchange (в т. ч. stackoverflow), который парсится
-# Необходимо для корректного составления отчета
-website = 'physics.stackexchange.com'
-
-# Настройки ограничения вывода
-# out_limit_type - тип ограничения
-# (0 - без ограничений
-#  1 - вывод первых out_limit пользователей,
-#  2 - вывод первых out_limit пользователей, а так же пользователей
-# с количеством подходящих постов таким же, как у пользователя под номером out_limit
-#  3 - вывод пользователей с количеством подходящих постов >= out_limit)
-out_limit_type = 2
-out_limit = 100
-
-# === Настройки выборки: ===
-
-# Минимальная репутация пользователя.
-# Если отбор по этому признаку не требуется, установите крайне малое значение
-min_reputation = 100
-
-# Максимальная репутация пользователя (не включительно).
-# Если отбор по этому признаку не требуется, установите крайне большое значение
-max_reputation = 10 ** 18
-
-# Начальное значение времени (часа) написания, для отбора постов
-# Если отбор по этому признаку не требуется, установите 0
-min_hour = 0
-
-# Конечное значение времени (часа) написания (не включительно)
-# Если отбор по этому признаку не требуется, установите 24
-max_hour = 24
-
-# Тип поста: '1' - Вопрос, '2' - Ответ:
-post_type = '2'
-
-# Отбирать только ответы, которые были приняты автором вопроса (да - True / нет - False)
-# Гарантируется корректная работа только при post_type == '2'
-filter_accepted = True
+settings = Settings()
