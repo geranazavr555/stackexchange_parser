@@ -2,7 +2,7 @@
 
 
 def read_strings_from_file(filename):
-    file = open(filename, 'r')
+    file = open(filename, 'r', encoding='utf-8')
     raw_list = file.readlines()
     file.close()
     return raw_list
@@ -50,13 +50,14 @@ class Settings:
         bool_keys = {
             'generate_css',
             'generate_header',
-            'filter_accepted'
+            'filter_accepted',
+            'debug'
         }
         for key in self.data:
             if key in int_keys:
                 self.data[key] = int(self.data[key])
             elif key in bool_keys:
-                self.data[key] = bool(self.data[key])
+                self.data[key] = bool(int(self.data[key]))
 
     def clear(self):
         self.data.clear()
