@@ -9,6 +9,7 @@ from time import time
 from settings import settings
 import parsing
 import reporting
+from filter import filter_posts, filter_users
 
 
 def read_raw_xml(filename, encoding_=settings['in_encoding']):
@@ -36,45 +37,13 @@ posts = parsing.parse(read_raw_xml(settings['posts_file_name']))
 if settings['debug']:
     print('reading and parsing time (sec):', time() - ts)
 
-# ID интересующих нас пользователей:
-# И их посты в подходящее время:
-interested_users_id = set()
-interested_posts = []
-
-# ID постов, которые были помечены, как "Ответ"
-accepted_answers_id = set()
-
-# == Выбор пользователей с подходящей репутацией ==
-for user in users:
-    # Проверка репутации пользователя:
-    if settings['min_reputation'] <= int(user['Reputation']) < settings['max_reputation']:
-        interested_users_id.add(user['Id'])
-
-# Если необходимо, поиск ответов, которые были помечены автором вопроса
-if settings['filter_accepted']:
-    for post in posts:
-        accepted_answers_id.add(post.get('AcceptedAnswerId'))
-
-# == Выбор постов искомых пользователей в подходящее время ==
-for post in posts:
-    # Если тип поста подходящий:
-    if post['PostTypeId'] == settings['post_type']:
-        # Если пост написан подходящим пользователем:
-        if post.get('OwnerUserId') in interested_users_id:
-            # Если пост написан в подходящее время:
-            if settings['min_hour'] <= parsing.get_hour(post['CreationDate']) < settings['max_hour']:
-                # Если необходимо, отбор ответов, помеченых автором вопроса
-                if settings['filter_accepted']:
-                    if post['Id'] in accepted_answers_id:
-                        interested_posts.append(post)
-                else:
-                    interested_posts.append(post)
+interested_posts = filter_posts(posts, filter_users(users))
 
 if settings['debug']:
     print('total parsed users:', len(users))
     print('total parsed posts:', len(posts))
-    print('total users that we are interested in:', len(interested_users_id))
-    print('total posts, that we are interested in:', len(interested_posts))
+    #print('total users that we are interested in:', len(interested_users_id))
+    #print('total posts, that we are interested in:', len(interested_posts))
 
 # == Предварительная генерация ответа ==
 

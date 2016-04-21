@@ -56,7 +56,3 @@ def parse_xml_line(line):
                 opened = True
     return content
 
-
-def get_hour(datetime):
-    """Выделяет из строки вида yyyy-mm-ddThh-mm-ss.sss часы"""
-    return int(datetime[datetime.find('T') + 1:datetime.find(':')])
