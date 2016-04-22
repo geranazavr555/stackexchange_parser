@@ -36,14 +36,10 @@ posts = parsing.parse(read_raw_xml(settings['posts_file_name']))
 
 if settings['debug']:
     print('reading and parsing time (sec):', time() - ts)
-
-interested_posts = filter_posts(posts, filter_users(users))
-
-if settings['debug']:
     print('total parsed users:', len(users))
     print('total parsed posts:', len(posts))
-    #print('total users that we are interested in:', len(interested_users_id))
-    #print('total posts, that we are interested in:', len(interested_posts))
+
+interested_posts = filter_posts(posts, filter_users(users))
 
 # == Предварительная генерация ответа ==
 
@@ -57,9 +53,8 @@ for post in interested_posts:
         user_to_posts_count[post['OwnerUserId']] = 1
 
 # Перевод словаря в список для последующей сортировки
-raw_output = []
-for i in user_to_posts_count:
-    raw_output.append((i, user_to_posts_count[i]))
+raw_output = [item for item in user_to_posts_count.items()]
+
 # Убывающая сортировка по количеству постов
 raw_output.sort(key=lambda x: x[1], reverse=True)
 
