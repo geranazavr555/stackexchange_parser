@@ -7,23 +7,10 @@
 from time import time
 
 from settings import settings
-import parsing
-import reporting
+from reading import read_raw_xml
+from parsing import parse
+from reporting import gen_html
 from filter import filter_posts, filter_users
-
-
-def read_raw_xml(filename, encoding_=settings['in_encoding']):
-    """Читает %filename% в кодировке %_encoding% и возвращает список строк"""
-
-    start_time = time()
-    file = open(filename, encoding=encoding_)
-    raw_list = file.readlines()
-    file.close()
-
-    if settings['debug']:
-        print('reading "' + filename + '" time (sec):', time() - start_time)
-
-    return raw_list
 
 ts = time()
 
@@ -31,8 +18,8 @@ if settings['debug']:
     print('= debug mode on =')
 
 # == Чтение xml ==
-users = parsing.parse(read_raw_xml(settings['users_file_name']))
-posts = parsing.parse(read_raw_xml(settings['posts_file_name']))
+users = parse(read_raw_xml(settings['users_file_name']))
+posts = parse(read_raw_xml(settings['posts_file_name']))
 
 if settings['debug']:
     print('reading and parsing time (sec):', time() - ts)
@@ -59,7 +46,7 @@ raw_output = [item for item in user_to_posts_count.items()]
 raw_output.sort(key=lambda x: x[1], reverse=True)
 
 # == Окончательная запись ответа ==
-reporting.gen_html(settings['html_output_file'], raw_output)
+gen_html(settings['html_output_file'], raw_output)
 
 if settings['debug']:
     print('total time (sec):', time() - ts)
