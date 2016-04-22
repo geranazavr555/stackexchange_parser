@@ -7,10 +7,85 @@
 from settings import settings
 
 
-def gen_html(filename, raw_data, site=settings['website']):
-    """Записывает html-страницу с результатами в %filename%"""
+class GenOutput:
 
-    def open_tag(tag, attributes=None):
+    def __init__(self, _raw_output):
+
+        self.raw_data = _raw_output
+
+        self.page = []
+
+        # stack - Хранит список ещё не закрытых html-тегов:
+        self.stack = []
+
+        self.__open_tag('html')
+        self.__open_tag('head')
+
+        self.__open_tag('meta', {'charset': 'utf-8'})
+        self.__close_tag()
+
+        if settings['generate_css']:
+            # Генерирование оформления
+            style = GenStyle()
+            style.gen_style('table', {'width': '35%', 'margin': 'auto'})
+            style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
+            style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
+            style.gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
+
+            self.__open_tag('style', {'type': 'text/css'})
+            self.__writeln(style.css)
+            self.__close_tag()
+
+        self.__close_tag()
+        self.__open_tag('body')
+
+        if settings['generate_header']:
+            # Генерирование заголовка
+            self.__open_tag('h1')
+            self.__writeln('Результаты выборки')
+            self.__close_tag()
+
+            self.__open_tag('hr')
+            self.__close_tag()
+
+            self.__writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
+                           ' перейдите по ссылке, кликнув на идентификатор пользователя')
+            self.__open_tag('br')
+            self.__close_tag()
+            self.__writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(self.raw_data)))
+            self.__open_tag('br')
+            self.__close_tag()
+            self.__writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
+
+            self.__open_tag('hr')
+            self.__close_tag()
+
+        self.__open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
+
+        self.__gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
+        i = 0
+        for row in self.raw_data:
+            i += 1
+            # Учитывание ограничений, заданных пользователем
+            if settings['out_limit_type'] == 1:
+                # Проверка ограничения на число пользователей
+                if i > settings['out_limit']:
+                    break
+            elif settings['out_limit_type'] == 2:
+                # Проверка мягкого ограничения на число пользователей
+                if row[1] < self.raw_data[settings['out_limit'] - 1][1]:
+                    break
+            elif settings['out_limit_type'] == 3:
+                # Проверка количества постов
+                if row[1] < settings['out_limit']:
+                    break
+            self.__gen_row([i, row[0], row[1]])
+
+        # закрытие оставшихся тегов:
+        while len(self.stack) > 0:
+            self.__close_tag()
+
+    def __open_tag(self, tag, attributes=None):
         # Если атрибутов нет - простой тег, иначе - генерация тега с атрибутами
         if attributes is None:
             line = '<' + tag + '>'
@@ -19,13 +94,14 @@ def gen_html(filename, raw_data, site=settings['website']):
             for attribute in attributes:
                 line += ' ' + attribute + '="' + attributes[attribute] + '"'
             line += '>'
-        writeln(line)
-        stack.append(tag)
+        self.__writeln(line)
+        self.stack.append(tag)
 
-    def close_tag():
-        writeln('</' + stack.pop() + '>')
+    def __close_tag(self):
+        self.__writeln('</' + self.stack.pop() + '>')
 
-    def gen_link(num, type_='users', website=site):
+    @staticmethod
+    def __gen_link(num, type_='users', website=settings['website']):
         """Генерирует адрес ресурса
 
         type_ - тип ресурса, по умолчанию = users
@@ -34,102 +110,33 @@ def gen_html(filename, raw_data, site=settings['website']):
         """
         return 'http://' + website + '/' + type_ + '/' + num
 
-    def writeln(line):
+    def __writeln(self, line):
         """Записывает строку с отступами в выходной файл"""
-        file.write(' ' * len(stack) * settings['html_spaces'] + line + '\n')
+        self.page.append(' ' * len(self.stack) * settings['html_spaces'] + line + '\n')
 
-    def gen_row(row, th_tag=False, user_id_pos=1):
-        """Создаёт и записывает одну строку таблицы"""
+    def __gen_row(self, row, th_tag=False, user_id_pos=1):
+        """Создаёт одну строку таблицы"""
 
-        open_tag('tr')
+        self.__open_tag('tr')
         for cell_i in range(len(row)):
             if th_tag:
-                open_tag('th')
+                self.__open_tag('th')
             else:
-                open_tag('td')
+                self.__open_tag('td')
             if cell_i == user_id_pos:
                 # Если текущая ячейка - user_id, то сгенерировать ссылку на него
-                open_tag('a', {'href': gen_link(row[cell_i]), 'target': '_blank'})
-                writeln(str(row[cell_i]))
-                close_tag()
+                self.__open_tag('a', {'href': self.__gen_link(row[cell_i]), 'target': '_blank'})
+                self.__writeln(str(row[cell_i]))
+                self.__close_tag()
             else:
-                writeln(str(row[cell_i]))
-            close_tag()
-        close_tag()
+                self.__writeln(str(row[cell_i]))
+            self.__close_tag()
+        self.__close_tag()
 
-    # stack - Хранит список ещё не закрытых html-тегов:
-    stack = []
-    file = open(filename, 'w', encoding='utf-8')
-
-    open_tag('html')
-    open_tag('head')
-
-    open_tag('meta', {'charset': 'utf-8'})
-    close_tag()
-
-    if settings['generate_css']:
-        # Генерирование оформления
-        style = GenStyle()
-        style.gen_style('table', {'width': '35%', 'margin': 'auto'})
-        style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
-        style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
-        style.gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
-
-        open_tag('style', {'type': 'text/css'})
-        writeln(style.css)
-        close_tag()
-        close_tag()
-
-    close_tag()
-    open_tag('body')
-
-    if settings['generate_header']:
-        # Генерирование заголовка
-        open_tag('h1')
-        writeln('Результаты выборки')
-        close_tag()
-
-        open_tag('hr')
-        close_tag()
-
-        writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
-                ' перейдите по ссылке, кликнув на идентификатор пользователя')
-        open_tag('br')
-        close_tag()
-        writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(raw_data)))
-        open_tag('br')
-        close_tag()
-        writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
-
-        open_tag('hr')
-        close_tag()
-
-    open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
-
-    gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
-    i = 0
-    for row in raw_data:
-        i += 1
-        # Учитывание ограничений, заданных пользователем
-        if settings['out_limit_type'] == 1:
-            # Проверка ограничения на число пользователей
-            if i > settings['out_limit']:
-                break
-        elif settings['out_limit_type'] == 2:
-            # Проверка мягкого ограничения на число пользователей
-            if row[1] < raw_data[settings['out_limit'] - 1][1]:
-                break
-        elif settings['out_limit_type'] == 3:
-            # Проверка количества постов
-            if row[1] < settings['out_limit']:
-                break
-        gen_row([i, row[0], row[1]])
-
-    # закрытие оставшихся тегов:
-    while len(stack) > 0:
-        close_tag()
-
-    file.close()
+    def writefile(self, filename=settings['html_output_file']):
+        file = open(filename, 'w', encoding='utf-8')
+        file.writelines(self.page)
+        file.close()
 
 
 class GenStyle:
@@ -142,7 +149,6 @@ class GenStyle:
         self.css = ''
 
     def gen_style(self, name, attributes):
-        self.css += ''
         self.__open_style(name)
         self.__write_style(attributes)
         self.__close_style()

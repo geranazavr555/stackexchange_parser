@@ -9,7 +9,7 @@ from time import time
 from settings import settings
 from reading import read_raw_xml
 from parsing import parse
-from reporting import gen_html
+from reporting import GenOutput
 from filter import filter_posts, filter_users
 
 ts = time()
@@ -46,7 +46,8 @@ raw_output = [item for item in user_to_posts_count.items()]
 raw_output.sort(key=lambda x: x[1], reverse=True)
 
 # == Окончательная запись ответа ==
-gen_html(settings['html_output_file'], raw_output)
+output = GenOutput(raw_output)
+output.writefile()
 
 if settings['debug']:
     print('total time (sec):', time() - ts)
