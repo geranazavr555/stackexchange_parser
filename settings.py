@@ -1,13 +1,6 @@
 """Файл настроек"""
 
 
-def read_strings_from_file(filename):
-    file = open(filename, 'r', encoding='utf-8')
-    raw_list = file.readlines()
-    file.close()
-    return raw_list
-
-
 class Settings:
     def __init__(self):
         self.data = {}
@@ -29,15 +22,21 @@ class Settings:
         self.data['max_hour'] = 24
 
     def load_from_file(self, filename='default.cfg'):
-        raw = read_strings_from_file(filename)
+
+        file = open(filename, 'r', encoding='utf-8')
+        raw = file.readlines()
+        file.close()
+
         for line in raw:
             if line.startswith('#') or line.startswith('\n'):
                 continue
             key, value = line.split(' = ')
             self.data[key] = value.rstrip('\n')
+
         self.repare_types()
 
     def repare_types(self):
+
         int_keys = {
             'html_spaces',
             'out_limit_type',
@@ -47,12 +46,14 @@ class Settings:
             'min_hour',
             'max_hour'
         }
+
         bool_keys = {
             'generate_css',
             'generate_header',
             'filter_accepted',
             'debug'
         }
+
         for key in self.data:
             if key in int_keys:
                 self.data[key] = int(self.data[key])
