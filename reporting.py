@@ -69,8 +69,14 @@ def gen_html(filename, raw_data, site=settings['website']):
 
     if settings['generate_css']:
         # Генерирование оформления
+        style = GenStyle()
+        style.gen_style('table', {'width': '35%', 'margin': 'auto'})
+        style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
+        style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
+        style.gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
+
         open_tag('style', {'type': 'text/css'})
-        writeln(gen_css())
+        writeln(style.css)
         close_tag()
         close_tag()
 
@@ -125,47 +131,33 @@ def gen_html(filename, raw_data, site=settings['website']):
 
     file.close()
 
-css = ''
 
-
-def gen_css():
+class GenStyle:
     """Генератор оформления
 
     Генерирует готовое оформление таблицы в css-формате
 
     """
+    def __init__(self):
+        self.css = ''
 
-    def open_style(stylename):
-        global css
-        css += stylename + ' {\n'
+    def gen_style(self, name, attributes):
+        self.css += ''
+        self.__open_style(name)
+        self.__write_style(attributes)
+        self.__close_style()
 
-    def close_style():
-        global css
-        css += '}\n'
+    def __open_style(self, stylename):
+        self.css += stylename + ' {\n'
 
-    def write_style(style):
+    def __close_style(self):
+        self.css += '}\n'
+
+    def __write_style(self, style):
         """Записывает блок атрибутов стиля"""
         for attribute in style:
-            gen_attribute(attribute, style[attribute])
+            self.__gen_attribute(attribute, style[attribute])
 
-    def gen_attribute(name, value):
+    def __gen_attribute(self, name, value):
         """Записывает пару {Атрибут : Значение}"""
-        global css
-        css += ' ' * settings['html_spaces'] + name + ': ' + value + ';\n'
-
-    def gen_style(name, attributes):
-        """Записывает один полный стиль"""
-        global css
-        css += ''
-        open_style(name)
-        write_style(attributes)
-        close_style()
-
-    global css
-
-    gen_style('table', {'width': '35%', 'margin': 'auto'})
-    gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
-    gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
-    gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
-
-    return css
+        self.css += ' ' * settings['html_spaces'] + name + ': ' + value + ';\n'
