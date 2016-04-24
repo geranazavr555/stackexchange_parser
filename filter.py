@@ -1,13 +1,11 @@
 
-from settings import settings
-
 
 def get_hour(datetime):
     """Выделяет из строки вида yyyy-mm-ddThh-mm-ss.sss часы"""
     return int(datetime[datetime.find('T') + 1:datetime.find(':')])
 
 
-def filter_users(users):
+def filter_users(users, settings):
     interested_users_id = set()
     # == Выбор пользователей с подходящей репутацией ==
     for user in users:
@@ -17,7 +15,7 @@ def filter_users(users):
     return interested_users_id
 
 
-def filter_posts(posts, interested_users_id):
+def filter_posts(posts, interested_users_id, settings):
     # ID постов, которые были помечены, как "Ответ"
     accepted_answers_id = set()
 

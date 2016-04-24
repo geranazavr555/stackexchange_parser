@@ -4,8 +4,6 @@
 
 """
 
-from settings import settings
-
 
 class GenOutput:
     """Генератор html-отчета
@@ -26,6 +24,16 @@ class GenOutput:
         # __stack - Хранит список ещё не закрытых html-тегов:
         self.__stack = []
 
+        # Установка настроек по умолчанию
+        self.settings = {
+            'generate_css': False,
+            'generate_header': False,
+            'website': 'physics.stackexchange.com',
+            'html_spaces': 2,
+            'out_limit_type': 0,
+            'html_output_file': 'results.html'
+        }
+
     def generate(self):
         """Генерирует страницу"""
 
@@ -36,14 +44,14 @@ class GenOutput:
         self.__open_tag('meta', {'charset': 'utf-8'})
         self.__close_tag()
 
-        if settings['generate_css']:
+        if self.settings['generate_css']:
             # Генерирование оформления
             self.__gen_css()
 
         self.__close_tag()
         self.__open_tag('body')
 
-        if settings['generate_header']:
+        if self.settings['generate_header']:
             # Генерирование заголовка
             self.__gen_header()
 
@@ -71,19 +79,13 @@ class GenOutput:
         """Закрывает последний открытый тег"""
         self.__writeln('</' + self.__stack.pop() + '>')
 
-    @staticmethod
-    def __gen_link(num, type_='users', website=settings['website']):
-        """Генерирует адрес ресурса
-
-        type_ - тип ресурса, по умолчанию = users
-        num - номер ресураа
-
-        """
-        return 'http://' + website + '/' + type_ + '/' + num
+    def __gen_link(self, num):
+        """Генерирует адрес ссылки на конкретного пользователя"""
+        return 'http://' + self.settings['website'] + '/users/' + num
 
     def __writeln(self, line):
         """Записывает строку с отступами"""
-        self.__page.append(' ' * len(self.__stack) * settings['html_spaces'] + line + '\n')
+        self.__page.append(' ' * len(self.__stack) * self.settings['html_spaces'] + line + '\n')
 
     def __gen_row(self, row, th_tag=False, user_id_pos=1):
         """Создаёт одну строку таблицы"""
@@ -114,7 +116,7 @@ class GenOutput:
         self.__open_tag('hr')
         self.__close_tag()
 
-        self.__writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
+        self.__writeln('Для перехода к профилю пользователя на сайте ' + self.settings['website'] +
                        ' перейдите по ссылке, кликнув на идентификатор пользователя')
         self.__open_tag('br')
         self.__close_tag()
@@ -151,25 +153,26 @@ class GenOutput:
         for row in self.__raw_data:
             i += 1
             # Учитывание ограничений, заданных пользователем
-            if settings['out_limit_type'] == 1:
+            if self.settings['out_limit_type'] == 1:
                 # Проверка ограничения на число пользователей
-                if i > settings['out_limit']:
+                if i > self.settings['out_limit']:
                     break
-            elif settings['out_limit_type'] == 2:
+            elif self.settings['out_limit_type'] == 2:
                 # Проверка мягкого ограничения на число пользователей
-                if row[1] < self.__raw_data[settings['out_limit'] - 1][1]:
+                if row[1] < self.__raw_data[self.settings['out_limit'] - 1][1]:
                     break
-            elif settings['out_limit_type'] == 3:
+            elif self.settings['out_limit_type'] == 3:
                 # Проверка количества постов
-                if row[1] < settings['out_limit']:
+                if row[1] < self.settings['out_limit']:
                     break
             self.__gen_row([i, row[0], row[1]])
 
         self.__close_tag()
 
-    def writefile(self, filename=settings['html_output_file']):
+    def writefile(self, filename=None):
         """Запись страницы на диск"""
-
+        if filename is None:
+            filename = self.settings['html_output_file']
         file = open(filename, 'w', encoding='utf-8')
         file.writelines(self.__page)
         file.close()
@@ -204,4 +207,4 @@ class GenStyle:
 
     def __gen_attribute(self, name, value):
         """Записывает пару {Атрибут : Значение}"""
-        self.css += ' ' * settings['html_spaces'] + name + ': ' + value + ';\n'
+        self.css += name + ': ' + value + ';\n'

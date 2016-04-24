@@ -1,5 +1,7 @@
 """Файл настроек"""
 
+from reading import read_raw_file
+
 
 class Settings:
     def __init__(self):
@@ -23,9 +25,7 @@ class Settings:
 
     def load_from_file(self, filename='default.cfg'):
 
-        file = open(filename, 'r', encoding='utf-8')
-        raw = file.readlines()
-        file.close()
+        raw = read_raw_file(filename)
 
         for line in raw:
             if line.startswith('#') or line.startswith('\n'):

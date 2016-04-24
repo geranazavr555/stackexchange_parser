@@ -1,17 +1,10 @@
-from time import time
-
-from settings import settings
 
 
-def read_raw_xml(filename, encoding_=settings['in_encoding']):
+def read_raw_file(filename, encoding_='utf-8'):
     """Читает %filename% в кодировке %_encoding% и возвращает список строк"""
 
-    start_time = time()
     file = open(filename, encoding=encoding_)
     raw_list = file.readlines()
     file.close()
-
-    if settings['debug']:
-        print('reading "' + filename + '" time (sec):', time() - start_time)
 
     return raw_list

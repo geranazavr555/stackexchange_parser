@@ -4,15 +4,10 @@
 
 """
 
-from time import time
-
-from settings import settings
-
 
 def parse(raw_data):
     """Преобразует список xml-строк в список словарей {ключ:значение}"""
 
-    start_time = time()
     parsed_data = []
 
     # Обрезание xml-заголовка и <%filename%></%filename%>:
@@ -20,9 +15,6 @@ def parse(raw_data):
 
     for row in raw_data:
         parsed_data.append(parse_xml_line(row))
-
-    if settings['debug']:
-        print('parse() time (sec):', time() - start_time)
 
     return parsed_data
 
