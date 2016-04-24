@@ -1,9 +1,17 @@
-"""Файл настроек"""
+"""Модуль настроек
+
+Модуль содержит класс Settings, отвечающий за настройки программы
+и инициализирует их.
+Зависит от reading.py
+
+"""
 
 from reading import read_raw_file
 
 
 class Settings:
+    """Класс настроек"""
+
     def __init__(self):
         self.data = {}
         self.load_defaults()
@@ -16,6 +24,7 @@ class Settings:
         return self.data.__str__()
 
     def load_defaults(self):
+        """Заполнение значений по умолчанию"""
 
         self.data['min_reputation'] = -10 ** 18
         self.data['max_reputation'] = 10 ** 18
@@ -24,6 +33,7 @@ class Settings:
         self.data['max_hour'] = 24
 
     def load_from_file(self, filename='default.cfg'):
+        """Считывание файла настроек из filename"""
 
         raw = read_raw_file(filename)
 
@@ -33,10 +43,14 @@ class Settings:
             key, value = line.split(' = ')
             self.data[key] = value.rstrip('\n')
 
-        self.repare_types()
+        self.repair_types()
 
-    def repare_types(self):
+    def repair_types(self):
+        """Явное приведение типов отдельных полей
+        Метод приводит типы полей от str() к необходимому
+        """
 
+        # Целочисленные поля
         int_keys = {
             'html_spaces',
             'out_limit_type',
@@ -47,6 +61,7 @@ class Settings:
             'max_hour'
         }
 
+        # Булевы поля
         bool_keys = {
             'generate_css',
             'generate_header',
@@ -54,6 +69,7 @@ class Settings:
             'debug'
         }
 
+        # Приведение типов
         for key in self.data:
             if key in int_keys:
                 self.data[key] = int(self.data[key])
@@ -61,6 +77,7 @@ class Settings:
                 self.data[key] = bool(int(self.data[key]))
 
     def clear(self):
+        """Сброс настроек"""
         self.data.clear()
         self.load_defaults()
 

@@ -1,3 +1,4 @@
+"""Модуль, содержащий инструменты для считывания"""
 
 
 def read_raw_file(filename, encoding_='utf-8'):

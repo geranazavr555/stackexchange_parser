@@ -47,4 +47,3 @@ def parse_xml_line(line):
             else:
                 opened = True
     return content
-
