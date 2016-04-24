@@ -11,12 +11,16 @@ class GenOutput:
 
     def __init__(self, _raw_output):
 
-        self.raw_data = _raw_output
+        # __raw_data - хранит данные для записи
+        self.__raw_data = _raw_output
 
-        self.page = []
+        # __page - хранит html-страницу
+        self.__page = []
 
-        # stack - Хранит список ещё не закрытых html-тегов:
-        self.stack = []
+        # __stack - Хранит список ещё не закрытых html-тегов:
+        self.__stack = []
+
+    def generate(self):
 
         self.__open_tag('html')
         self.__open_tag('head')
@@ -26,64 +30,19 @@ class GenOutput:
 
         if settings['generate_css']:
             # Генерирование оформления
-            style = GenStyle()
-            style.gen_style('table', {'width': '35%', 'margin': 'auto'})
-            style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
-            style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
-            style.gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
-
-            self.__open_tag('style', {'type': 'text/css'})
-            self.__writeln(style.css)
-            self.__close_tag()
+            self.__gen_css()
 
         self.__close_tag()
         self.__open_tag('body')
 
         if settings['generate_header']:
             # Генерирование заголовка
-            self.__open_tag('h1')
-            self.__writeln('Результаты выборки')
-            self.__close_tag()
+            self.__gen_header()
 
-            self.__open_tag('hr')
-            self.__close_tag()
+        self.__gen_table()
 
-            self.__writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
-                           ' перейдите по ссылке, кликнув на идентификатор пользователя')
-            self.__open_tag('br')
-            self.__close_tag()
-            self.__writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(self.raw_data)))
-            self.__open_tag('br')
-            self.__close_tag()
-            self.__writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
-
-            self.__open_tag('hr')
-            self.__close_tag()
-
-        self.__open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
-
-        self.__gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
-        i = 0
-        for row in self.raw_data:
-            i += 1
-            # Учитывание ограничений, заданных пользователем
-            if settings['out_limit_type'] == 1:
-                # Проверка ограничения на число пользователей
-                if i > settings['out_limit']:
-                    break
-            elif settings['out_limit_type'] == 2:
-                # Проверка мягкого ограничения на число пользователей
-                if row[1] < self.raw_data[settings['out_limit'] - 1][1]:
-                    break
-            elif settings['out_limit_type'] == 3:
-                # Проверка количества постов
-                if row[1] < settings['out_limit']:
-                    break
-            self.__gen_row([i, row[0], row[1]])
-
-        # закрытие оставшихся тегов:
-        while len(self.stack) > 0:
-            self.__close_tag()
+        self.__close_tag()
+        self.__close_tag()
 
     def __open_tag(self, tag, attributes=None):
         # Если атрибутов нет - простой тег, иначе - генерация тега с атрибутами
@@ -95,10 +54,10 @@ class GenOutput:
                 line += ' ' + attribute + '="' + attributes[attribute] + '"'
             line += '>'
         self.__writeln(line)
-        self.stack.append(tag)
+        self.__stack.append(tag)
 
     def __close_tag(self):
-        self.__writeln('</' + self.stack.pop() + '>')
+        self.__writeln('</' + self.__stack.pop() + '>')
 
     @staticmethod
     def __gen_link(num, type_='users', website=settings['website']):
@@ -112,7 +71,7 @@ class GenOutput:
 
     def __writeln(self, line):
         """Записывает строку с отступами в выходной файл"""
-        self.page.append(' ' * len(self.stack) * settings['html_spaces'] + line + '\n')
+        self.__page.append(' ' * len(self.__stack) * settings['html_spaces'] + line + '\n')
 
     def __gen_row(self, row, th_tag=False, user_id_pos=1):
         """Создаёт одну строку таблицы"""
@@ -133,9 +92,65 @@ class GenOutput:
             self.__close_tag()
         self.__close_tag()
 
+    def __gen_header(self):
+        self.__open_tag('h1')
+        self.__writeln('Результаты выборки')
+        self.__close_tag()
+
+        self.__open_tag('hr')
+        self.__close_tag()
+
+        self.__writeln('Для перехода к профилю пользователя на сайте ' + settings['website'] +
+                       ' перейдите по ссылке, кликнув на идентификатор пользователя')
+        self.__open_tag('br')
+        self.__close_tag()
+        self.__writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(self.__raw_data)))
+        self.__open_tag('br')
+        self.__close_tag()
+        self.__writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
+
+        self.__open_tag('hr')
+        self.__close_tag()
+
+    def __gen_css(self):
+
+        style = GenStyle()
+        style.gen_style('table', {'width': '35%', 'margin': 'auto'})
+        style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
+        style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
+        style.gen_style('tr:hover', {'background': 'rgba(165, 255, 235, 0.75)'})
+
+        self.__open_tag('style', {'type': 'text/css'})
+        self.__writeln(style.css)
+        self.__close_tag()
+
+    def __gen_table(self):
+        self.__open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
+
+        self.__gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
+        i = 0
+        for row in self.__raw_data:
+            i += 1
+            # Учитывание ограничений, заданных пользователем
+            if settings['out_limit_type'] == 1:
+                # Проверка ограничения на число пользователей
+                if i > settings['out_limit']:
+                    break
+            elif settings['out_limit_type'] == 2:
+                # Проверка мягкого ограничения на число пользователей
+                if row[1] < self.__raw_data[settings['out_limit'] - 1][1]:
+                    break
+            elif settings['out_limit_type'] == 3:
+                # Проверка количества постов
+                if row[1] < settings['out_limit']:
+                    break
+            self.__gen_row([i, row[0], row[1]])
+
+        self.__close_tag()
+
     def writefile(self, filename=settings['html_output_file']):
         file = open(filename, 'w', encoding='utf-8')
-        file.writelines(self.page)
+        file.writelines(self.__page)
         file.close()
 
 

@@ -47,6 +47,7 @@ raw_output.sort(key=lambda x: x[1], reverse=True)
 
 # == Окончательная запись ответа ==
 output = GenOutput(raw_output)
+output.generate()
 output.writefile()
 
 if settings['debug']:
