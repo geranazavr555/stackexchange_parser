@@ -8,8 +8,14 @@ from settings import settings
 
 
 class GenOutput:
+    """Генератор html-отчета
+
+    Генерирует html-страницу с результатами выборки
+
+    """
 
     def __init__(self, _raw_output):
+        """Инициализирует генератор, используя данные выборки"""
 
         # __raw_data - хранит данные для записи
         self.__raw_data = _raw_output
@@ -21,10 +27,12 @@ class GenOutput:
         self.__stack = []
 
     def generate(self):
+        """Генерирует страницу"""
 
         self.__open_tag('html')
         self.__open_tag('head')
 
+        # Явное указание кодировки
         self.__open_tag('meta', {'charset': 'utf-8'})
         self.__close_tag()
 
@@ -39,12 +47,15 @@ class GenOutput:
             # Генерирование заголовка
             self.__gen_header()
 
+        # Вызов генератора таблицы с результатами
         self.__gen_table()
 
         self.__close_tag()
         self.__close_tag()
 
     def __open_tag(self, tag, attributes=None):
+        """Открывает html-tag"""
+
         # Если атрибутов нет - простой тег, иначе - генерация тега с атрибутами
         if attributes is None:
             line = '<' + tag + '>'
@@ -57,6 +68,7 @@ class GenOutput:
         self.__stack.append(tag)
 
     def __close_tag(self):
+        """Закрывает последний открытый тег"""
         self.__writeln('</' + self.__stack.pop() + '>')
 
     @staticmethod
@@ -70,7 +82,7 @@ class GenOutput:
         return 'http://' + website + '/' + type_ + '/' + num
 
     def __writeln(self, line):
-        """Записывает строку с отступами в выходной файл"""
+        """Записывает строку с отступами"""
         self.__page.append(' ' * len(self.__stack) * settings['html_spaces'] + line + '\n')
 
     def __gen_row(self, row, th_tag=False, user_id_pos=1):
@@ -93,6 +105,8 @@ class GenOutput:
         self.__close_tag()
 
     def __gen_header(self):
+        """Генерирование заголовка и дополнительной информации"""
+
         self.__open_tag('h1')
         self.__writeln('Результаты выборки')
         self.__close_tag()
@@ -113,6 +127,7 @@ class GenOutput:
         self.__close_tag()
 
     def __gen_css(self):
+        """Запись стилей"""
 
         style = GenStyle()
         style.gen_style('table', {'width': '35%', 'margin': 'auto'})
@@ -125,9 +140,13 @@ class GenOutput:
         self.__close_tag()
 
     def __gen_table(self):
+        """Запись таблицы с результатами выборки"""
+
         self.__open_tag('table', {'border': '1', 'rules': 'all', 'cellpadding': '3'})
 
+        # Запись заголовка таблицы
         self.__gen_row(['#', 'User id', 'Posts count'], th_tag=True, user_id_pos=-1)
+
         i = 0
         for row in self.__raw_data:
             i += 1
@@ -149,6 +168,8 @@ class GenOutput:
         self.__close_tag()
 
     def writefile(self, filename=settings['html_output_file']):
+        """Запись страницы на диск"""
+
         file = open(filename, 'w', encoding='utf-8')
         file.writelines(self.__page)
         file.close()
@@ -160,10 +181,12 @@ class GenStyle:
     Генерирует готовое оформление таблицы в css-формате
 
     """
+
     def __init__(self):
         self.css = ''
 
     def gen_style(self, name, attributes):
+        """Генерирует стиль name с параметрами attributes"""
         self.__open_style(name)
         self.__write_style(attributes)
         self.__close_style()
