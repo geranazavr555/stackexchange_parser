@@ -24,6 +24,7 @@ if len(argv) > 1:
                 print(line)
         else:
             print('Смотрите по адресу https://github.com/geranazavr555/stackexchange_parser/README.md')
+        exit(0)
     else:
         settings.load_from_file(argv[1])
 
