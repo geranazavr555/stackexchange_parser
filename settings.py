@@ -82,6 +82,3 @@ class Settings:
         self.load_defaults()
 
 settings = Settings()
-
-if settings['debug']:
-    print(settings)
