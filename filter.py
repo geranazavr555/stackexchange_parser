@@ -51,7 +51,7 @@ def filter_posts(posts, interested_users_id, settings):
                 if settings['min_hour'] <= __get_hour(post['CreationDate']) < settings['max_hour']:
 
                     # Если необходимо, отбор ответов, помеченых автором вопроса
-                    if settings['filter_accepted']:
+                    if settings['filter_accepted'] and settings['post_type'] == '2':
                         if post['Id'] in accepted_answers_id:
                             interested_posts.append(post)
                     else:
