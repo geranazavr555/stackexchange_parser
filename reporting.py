@@ -106,6 +106,63 @@ class GenOutput:
             self.__close_tag()
         self.__close_tag()
 
+    def __gen_marked_list(self, data):
+        """Генерирует маркированный список строк из data"""
+
+        self.__open_tag('ul')
+
+        for line in data:
+            self.__open_tag('li')
+            self.__writeln(line)
+            self.__close_tag()
+
+        self.__close_tag()
+
+    def __write_settings(self):
+        """Записывает настройки выборки в отчет"""
+
+        self.__open_tag('h2')
+        self.__writeln('Настройки выборки')
+        self.__close_tag()
+
+        str_settings = []
+
+        if self.settings['min_reputation'] > -10 ** 18:
+            str_settings.append('Минимальная репутация пользователя: ' +
+                                str(self.settings['min_reputation']))
+        else:
+            str_settings.append('Минимальная репутация пользователя: Неограничена')
+
+        if self.settings['max_reputation'] < 10 ** 18:
+            str_settings.append('Максимальная репутация пользователя (не включительно): ' +
+                                str(self.settings['max_reputation']))
+        else:
+            str_settings.append('Максимальная репутация пользователя: Неограничена')
+
+            str_settings.append('Отбор постов, написаных в период между ' + str(self.settings['min_hour']) +
+                                ' и ' + str(self.settings['max_hour']) + ' часами.')
+
+        if self.settings['post_type'] == '1':
+            str_settings.append('Тип постов: Вопрос')
+        else:
+            str_settings.append('Тип постов: Ответ')
+            if self.settings['filter_accepted']:
+                str_settings.append('Отбор только ответов, принятых автором вопроса')
+
+        if self.settings['out_limit_type'] == 1:
+            str_settings.append('Вывод первых ' + str(self.settings['out_limit']) + ' пользователей')
+        elif self.settings['out_limit_type'] == 2:
+            str_settings.append('Вывод пользователей, с количеством подходящих постов не менее,' +
+                                'чем у пользователя под номером ' +
+                                str(self.settings['out_limit']))
+        elif self.settings['out_limit_type'] == 3:
+            str_settings.append('Вывод пользователей, с количеством подходящих постом, не менее, чем ' +
+                                str(self.settings['out_limit']))
+        else:
+            str_settings.append('Вывод: Без ограничений')
+
+        self.__gen_marked_list(str_settings)
+
     def __gen_header(self):
         """Генерирование заголовка и дополнительной информации"""
 
@@ -123,7 +180,11 @@ class GenOutput:
         self.__writeln('Всего найдено пользователей, имеющих хотя бы 1 подходящий пост: ' + str(len(self.__raw_data)))
         self.__open_tag('br')
         self.__close_tag()
-        self.__writeln('Могут быть показаны не все пользователи, смотрите настройки составления отчёта')
+
+        self.__open_tag('hr')
+        self.__close_tag()
+
+        self.__write_settings()
 
         self.__open_tag('hr')
         self.__close_tag()
