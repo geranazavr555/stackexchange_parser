@@ -193,9 +193,9 @@ class GenOutput:
         """Запись стилей"""
 
         style = GenStyle()
-        style.gen_style('body', {'margin' : '3%'})
-        style.gen_style('h1', {'text-align' : 'center'})
-        style.gen_style('h2', {'margin-left' : '1%'})
+        style.gen_style('body', {'margin': '3%'})
+        style.gen_style('h1', {'text-align': 'center'})
+        style.gen_style('h2', {'margin-left': '1%'})
         style.gen_style('table', {'width': '35%', 'margin': 'auto'})
         style.gen_style('tr', {'background': 'rgba(165, 255, 235, 0.5)'})
         style.gen_style('th', {'background': 'rgba(165, 255, 235, 1)'})
