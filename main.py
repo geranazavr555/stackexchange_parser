@@ -6,6 +6,7 @@
 
 from time import time
 from sys import argv
+from os.path import isfile
 
 from settings import settings
 from reading import read_raw_file
@@ -16,7 +17,12 @@ from filter import filter_posts, filter_users
 ts = time()
 
 if len(argv) > 1:
-    settings.load_from_file(argv[1])
+    if argv[1] == '--help':
+        if isfile('README.md'):
+            for line in read_raw_file('README.md'):
+                print(line)
+    else:
+        settings.load_from_file(argv[1])
 
 if settings['debug']:
     print('= debug mode on =')
