@@ -7,6 +7,7 @@
 from time import time
 from sys import argv
 from os.path import isfile
+from datetime import datetime
 
 from settings import settings
 from reading import read_raw_file
@@ -74,7 +75,12 @@ raw_output.sort(key=lambda x: x[1], reverse=True)
 output = GenOutput(raw_output)
 output.settings = settings
 output.generate()
-output.writefile()
+
+# Если явно не указан файл для вывода - сформировать название используя текущую дату и время
+if settings['html_output_file'] == '':
+    output.writefile('results_' + datetime.strftime(datetime.now(), '%d_%m_%Y_%H_%M_%S') + '.html')
+else:
+    output.writefile()
 
 if settings['debug']:
     print('total time (sec):', time() - ts)

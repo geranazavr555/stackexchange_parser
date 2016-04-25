@@ -36,7 +36,7 @@ class Settings:
         self.data['generate_css'] = False
         self.data['generate_header'] = False
         self.data['html_spaces'] = 2
-        self.data['html_output_file'] = 'results.html'
+        self.data['html_output_file'] = ''
 
     def validate(self):
         """Проверяет правильность настроек.
