@@ -236,10 +236,9 @@ class GenOutput:
             filename = self.settings['html_output_file']
         try:
             file = open(filename, 'w', encoding='utf-8')
-        except IOError as error:
+        except IOError:
             # Ошибка создания файла.
-            print('Ошибка открытия файла на запись.')
-            print(error)
+            print('Ошибка открытия файла ' + filename + ' на запись.')
         else:
             file.writelines(self.__page)
             file.close()

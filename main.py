@@ -31,8 +31,17 @@ if settings['debug']:
     print(settings)
 
 # == Чтение xml ==
-users = parse(read_raw_file(settings['users_file_name']))
-posts = parse(read_raw_file(settings['posts_file_name']))
+try:
+    users = parse(read_raw_file(settings['users_file_name']))
+except IOError:
+    print('Невозможно открыть файл ' + settings['users_file_name'] + ' для чтения')
+    exit(1)
+
+try:
+    posts = parse(read_raw_file(settings['posts_file_name']))
+except IOError:
+    print('Невозможно открыть файл ' + settings['posts_file_name'] + ' для чтения')
+    exit(1)
 
 if settings['debug']:
     print('reading and parsing time (sec):', time() - ts)
