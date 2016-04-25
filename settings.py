@@ -35,15 +35,19 @@ class Settings:
     def load_from_file(self, filename='default.cfg'):
         """Считывание файла настроек из filename"""
 
-        raw = read_raw_file(filename)
-
-        for line in raw:
-            if line.startswith('#') or line.startswith('\n'):
-                continue
-            key, value = line.split(' = ')
-            self.data[key] = value.rstrip('\n')
-
-        self.repair_types()
+        try:
+            raw = read_raw_file(filename)
+        except IOError:
+            # Если произошла ошибка, то файла не существует. Возможно, так и задумано.
+            pass
+        else:
+            for line in raw:
+                if line.startswith('#') or line.startswith('\n'):
+                    continue
+                key, value = line.split(' = ')
+                self.data[key] = value.rstrip('\n')
+        finally:
+            self.repair_types()
 
     def repair_types(self):
         """Явное приведение типов отдельных полей

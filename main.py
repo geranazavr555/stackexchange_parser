@@ -21,6 +21,8 @@ if len(argv) > 1:
         if isfile('README.md'):
             for line in read_raw_file('README.md'):
                 print(line)
+        else:
+            print('Смотрите по адресу https://github.com/geranazavr555/stackexchange_parser/README.md')
     else:
         settings.load_from_file(argv[1])
 

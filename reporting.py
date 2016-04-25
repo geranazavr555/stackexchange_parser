@@ -234,9 +234,15 @@ class GenOutput:
         """Запись страницы на диск"""
         if filename is None:
             filename = self.settings['html_output_file']
-        file = open(filename, 'w', encoding='utf-8')
-        file.writelines(self.__page)
-        file.close()
+        try:
+            file = open(filename, 'w', encoding='utf-8')
+        except IOError as error:
+            # Ошибка создания файла.
+            print('Ошибка открытия файла на запись.')
+            print(error)
+        else:
+            file.writelines(self.__page)
+            file.close()
 
 
 class GenStyle:
