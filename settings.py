@@ -28,9 +28,43 @@ class Settings:
 
         self.data['min_reputation'] = -10 ** 18
         self.data['max_reputation'] = 10 ** 18
-
         self.data['min_hour'] = 0
         self.data['max_hour'] = 24
+
+        self.data['debug'] = False
+        self.data['out_limit_type'] = 0
+        self.data['generate_css'] = False
+        self.data['generate_header'] = False
+        self.data['html_spaces'] = 2
+        self.data['html_output_file'] = 'results.html'
+
+    def validate(self):
+        """Проверяет правильность настроек.
+        При наличии ошибки выводит её описание в stdout.
+        Возвращвет, правильно ли заполнены настройки. (True/False)
+        """
+
+        keys = {
+            'users_file_name',
+            'posts_file_name',
+            'post_type',
+            'website'
+        }
+        for key in keys:
+            if key not in self.data:
+                print('Не заполнено поле ' + key)
+                return False
+
+        if self.data['out_limit_type'] > 0 and 'out_limit' not in self.data:
+            print('Указан тип ограничения на вывод, но не указано его значение.')
+            print('Не заполнено поле out_limit')
+            return False
+
+        if self.data['post_type'] == '2' and 'filter_accepted' not in self.data:
+            print('Не заполнено поле filter_accepted')
+            return False
+
+        return True
 
     def load_from_file(self, filename='default.cfg'):
         """Считывание файла настроек из filename"""

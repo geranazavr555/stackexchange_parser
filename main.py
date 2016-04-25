@@ -26,6 +26,9 @@ if len(argv) > 1:
     else:
         settings.load_from_file(argv[1])
 
+if not settings.validate():
+    exit(1)
+
 if settings['debug']:
     print('= debug mode on =')
     print(settings)
